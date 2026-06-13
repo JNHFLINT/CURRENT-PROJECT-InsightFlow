@@ -4,3 +4,4 @@
 - Ability to read excel spreadsheet so that we can use the data inside.
 - Able to upload file to streamlit.
 - Created boxes for lines of sheets and also visual graphs.
+- Added a virtual recommendator using Groq model "llama-3.3-70b-versatile" (current working free version).

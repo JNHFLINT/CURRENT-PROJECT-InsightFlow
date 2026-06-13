@@ -1,3 +1,5 @@
+from ai_recommendations import generate_recommendations
+
 import pandas as pd 
 import openpyxl
 import streamlit as st
@@ -43,3 +45,14 @@ if uploaded_file:
     st.subheader("Monthly Summary")
     st.dataframe(monthly_df)
     st.plotly_chart(fig_monthly)
+
+    st.header("AI Insights")
+
+if st.button("Generate AI Recommendations"):
+    insights = generate_recommendations(
+        jobs_df,
+        employees_df,
+        monthly_df,
+        st.secrets["GROQ_API_KEY"]
+    )
+    st.write(insights)
