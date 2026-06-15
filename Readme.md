@@ -10,3 +10,4 @@
 
 
 6/14/2026
+- Added database functionality so we can login and connect various types of databases.
