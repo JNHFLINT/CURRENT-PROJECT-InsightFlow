@@ -1,4 +1,6 @@
 from groq import Groq
+import json
+
 
 def summarize_df(df):
     return {
@@ -7,6 +9,7 @@ def summarize_df(df):
         "sample": df.head(5).to_dict(orient="records"),
         "stats": df.describe(include="all").to_dict()
     }
+
 
 def generate_recommendations(jobs_df, employees_df, monthly_df, api_key):
     client = Groq(api_key=api_key)
@@ -18,16 +21,16 @@ def generate_recommendations(jobs_df, employees_df, monthly_df, api_key):
     prompt = f"""
     You are an expert business analyst.
 
-    Here are summarized datasets:
+    Here are summarized datasets in JSON format:
 
     Jobs Summary:
-    {jobs_summary}
+    {json.dumps(jobs_summary, indent=2)}
 
     Employees Summary:
-    {employees_summary}
+    {json.dumps(employees_summary, indent=2)}
 
     Monthly Summary:
-    {monthly_summary}
+    {json.dumps(monthly_summary, indent=2)}
 
     Based on these summaries, provide:
     - Key insights

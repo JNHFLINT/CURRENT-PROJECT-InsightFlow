@@ -1,58 +1,103 @@
 from ai_recommendations import generate_recommendations
+from sqlalchemy import create_engine
 
-import pandas as pd 
-import openpyxl
+import pandas as pd
 import streamlit as st
 import plotly.express as px
 
-# Upload Excel File via streamlit
-uploaded_file = st.file_uploader(
-    "Upload Excel File",
-    type=["xlsx"]
+
+# -----------------------------
+# Database connection helper
+# -----------------------------
+def get_engine(db_type, host, user, password, database):
+    if db_type == "PostgreSQL":
+        return create_engine(f"postgresql://{user}:{password}@{host}/{database}")
+    if db_type == "MySQL":
+        return create_engine(f"mysql+pymysql://{user}:{password}@{host}/{database}")
+    if db_type == "SQLite":
+        return create_engine(f"sqlite:///{database}")
+    return None
+
+
+# -----------------------------
+# Streamlit UI
+# -----------------------------
+st.title("Business Insights Dashboard")
+
+data_source = st.radio(
+    "Select Data Source",
+    ["Excel File", "Database"]
 )
 
-# Read the uploaded Excel file
-if uploaded_file:
+jobs_df = None
+employees_df = None
+monthly_df = None
 
-    sheets = pd.read_excel(
-        uploaded_file,
-        sheet_name=None
-    )
 
-    # Display the list of sheets found in the Excel file
-    st.write("Sheets Found:")
-    st.write(list(sheets.keys()))
+# -----------------------------
+# Unified Data Loading Section
+# -----------------------------
+st.subheader("Load Data")
 
-    # Load the data from each sheet
-    jobs_df = sheets["Jobs"]
-    employees_df = sheets["Employees"]
-    monthly_df = sheets["Monthly_Summary"]
+if data_source == "Excel File":
+    uploaded_file = st.file_uploader("Upload Excel File", type=["xlsx"])
 
-    # Create visualizations for data "jobs"
-    fig_jobs = px.line(jobs_df, x="Job_ID", y="Total_Job_Cost")
+    if uploaded_file:
+        sheets = pd.read_excel(uploaded_file, sheet_name=None)
+
+        st.write("Sheets Found:", list(sheets.keys()))
+
+        jobs_df = sheets.get("Jobs")
+        employees_df = sheets.get("Employees")
+        monthly_df = sheets.get("Monthly_Summary")
+        st.success("Excel data loaded successfully!")
+
+
+elif data_source == "Database":
+    db_type = st.selectbox("Database Type", ["PostgreSQL", "MySQL", "SQLite"])
+    host = st.text_input("Host (ignored for SQLite)")
+    user = st.text_input("User (ignored for SQLite)")
+    password = st.text_input("Password", type="password")
+    database = st.text_input("Database Name or SQLite File Path")
+
+    if st.button("Connect to Database"):
+        try:
+            engine = get_engine(db_type, host, user, password, database)
+
+            jobs_df = pd.read_sql("SELECT * FROM Jobs", engine)
+            employees_df = pd.read_sql("SELECT * FROM Employees", engine)
+            monthly_df = pd.read_sql("SELECT * FROM Monthly_Summary", engine)
+
+            st.success("Connected and loaded tables successfully!")
+
+        except Exception as e:
+            st.error(f"Database connection failed: {e}")
+
+
+# -----------------------------
+# Visualizations (shared)
+# -----------------------------
+if jobs_df is not None:
+
     st.subheader("Jobs")
     st.dataframe(jobs_df)
-    st.plotly_chart(fig_jobs)
+    st.plotly_chart(px.line(jobs_df, x="Job_ID", y="Total_Job_Cost"))
 
-    # Create visualizations for data "employees"
-    fig_employees = px.bar(employees_df, x="Employee_ID", y="Total_Worker_Cost")
     st.subheader("Employees")
     st.dataframe(employees_df)
-    st.plotly_chart(fig_employees)
+    st.plotly_chart(px.bar(employees_df, x="Employee_ID", y="Total_Worker_Cost"))
 
-    # Create visualizations for data "monthly"
-    fig_monthly = px.line(monthly_df, x="Month", y="Revenue")
     st.subheader("Monthly Summary")
     st.dataframe(monthly_df)
-    st.plotly_chart(fig_monthly)
+    st.plotly_chart(px.line(monthly_df, x="Month", y="Revenue"))
 
     st.header("AI Insights")
 
-if st.button("Generate AI Recommendations"):
-    insights = generate_recommendations(
-        jobs_df,
-        employees_df,
-        monthly_df,
-        st.secrets["GROQ_API_KEY"]
-    )
-    st.write(insights)
+    if st.button("Generate AI Recommendations"):
+        insights = generate_recommendations(
+            jobs_df,
+            employees_df,
+            monthly_df,
+            st.secrets["GROQ_API_KEY"]
+        )
+        st.write(insights)
