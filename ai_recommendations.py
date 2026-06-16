@@ -2,6 +2,9 @@ from groq import Groq
 import json
 
 
+# ---------------------------------------------------------
+# Data Summary Helper
+# ---------------------------------------------------------
 def summarize_df(df):
     return {
         "columns": list(df.columns),
@@ -11,6 +14,9 @@ def summarize_df(df):
     }
 
 
+# ---------------------------------------------------------
+# AI Recommendations Helper
+# ---------------------------------------------------------
 def generate_recommendations(jobs_df, employees_df, monthly_df, api_key):
     client = Groq(api_key=api_key)
 
@@ -18,6 +24,9 @@ def generate_recommendations(jobs_df, employees_df, monthly_df, api_key):
     employees_summary = summarize_df(employees_df)
     monthly_summary = summarize_df(monthly_df)
 
+    # ---------------------------------------------------------
+    # AI Prompt which can be changed
+    # ---------------------------------------------------------
     prompt = f"""
     You are an expert business analyst.
 
