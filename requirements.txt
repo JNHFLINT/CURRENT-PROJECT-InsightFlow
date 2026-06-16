@@ -1,9 +1,10 @@
-
 streamlit
 pandas
+numpy
 openpyxl
 plotly
-numpy
-openai
+sqlalchemy
+psycopg2-binary
+pymysql
+groq
 python-dotenv
-
