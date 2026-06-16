@@ -54,13 +54,17 @@ if data_source == "Excel File":
 
 
 elif data_source == "Database":
-    db_type = st.selectbox("Database Type", ["PostgreSQL", "MySQL", "SQLite"])
-    host = st.text_input("Host (ignored for SQLite)")
-    user = st.text_input("User (ignored for SQLite)")
-    password = st.text_input("Password", type="password")
-    database = st.text_input("Database Name or SQLite File Path")
 
-    if st.button("Connect to Database"):
+    with st.form("db_form"):
+        db_type = st.selectbox("Database Type", ["PostgreSQL", "MySQL", "SQLite"])
+        host = st.text_input("Host (ignored for SQLite)", key="db_host")
+        user = st.text_input("User (ignored for SQLite)", key="db_user")
+        password = st.text_input("Password", type="password", key="db_password")
+        database = st.text_input("Database Name or SQLite File Path", key="db_name")
+
+        submitted = st.form_submit_button("Connect to Database")
+
+    if submitted:
         try:
             engine = get_engine(db_type, host, user, password, database)
 
