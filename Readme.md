@@ -16,4 +16,6 @@
 
 
 6/16/2026
-
+- Fixed issue with database font issues.
+- NEED TO FIX: Further font issues, need to convert all database columns and rows to lowercase for accessibility.
+- Cleaned up code.
