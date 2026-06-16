@@ -13,5 +13,7 @@
 - Added database functionality so we can login and connect various types of databases.
 - PostGreSQL is main one I decided to use as I can easily host servers and create large databases.
 
-6/15/2026
+
+
+6/16/2026
 

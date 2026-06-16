@@ -85,15 +85,15 @@ if jobs_df is not None:
 
     st.subheader("Jobs")
     st.dataframe(jobs_df)
-    st.plotly_chart(px.line(jobs_df, x="Job_ID", y="Total_Job_Cost"))
+    st.plotly_chart(px.line(jobs_df, x="job_id", y="total_job_cost"))
 
     st.subheader("Employees")
     st.dataframe(employees_df)
-    st.plotly_chart(px.bar(employees_df, x="Employee_ID", y="Total_Worker_Cost"))
+    st.plotly_chart(px.bar(employees_df, x="employee_id", y="total_worker_cost"))
 
     st.subheader("Monthly Summary")
     st.dataframe(monthly_df)
-    st.plotly_chart(px.line(monthly_df, x="Month", y="Revenue"))
+    st.plotly_chart(px.line(monthly_df, x="month", y="revenue"))
 
     st.header("AI Insights")
 
